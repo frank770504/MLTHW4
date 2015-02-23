@@ -1,26 +1,10 @@
-clc
-clear all
-load NNet.mat
-
-teData = load('hw4_nnet_test.dat');
-x_te = teData(:,1:2);
-y_te = teData(:,end);
-
-M = 6;
-
-Nout = 1;
-
-Ndim = size(x_te,2);
-
-Nte = size(x_te,1);
-
-Net = [Ndim M Nout];
+function [ H E ] = NNetTest(x_te, y_te, Net, NNet)
+%NNETTEST Summary of this function goes here
+%   Detailed explanation goes here
 
 Nhl = size(Net,2)-2;
 
-r = 0.1; eta = 0.1;
-
-T = 50000;
+Nte = size(x_te,1);
 
 H = [];
 NNetTeCol = {};
@@ -45,4 +29,6 @@ end
 
 y_pre = H(:,2);
 
-Eout = sum(y_te~=y_pre)/Nte;
+E = sum(y_te~=y_pre)/Nte;
+
+end
