@@ -17,14 +17,14 @@ y_te = teData(:,end);
 
 Nte = size(x_te,1);
 
-k = 7;
+k = 5;
 
 h = zeros(Nte,1);
 for i=1:Nte,
     y = y_tr;
     x = x_te(i,:);
     X = repmat(x,Ntr,1);
-    dist = sqrt(sum((x_tr - X).^2,2));
+    dist = (sum((x_tr - X).^2,2));
     dist = [dist [1:Ntr]'];
     sort_dist = sortrows(dist,1);
     ind = sort_dist(1:5,2);
