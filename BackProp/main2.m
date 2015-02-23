@@ -1,48 +1,42 @@
 clc
 clear all
-load NNet.mat
+close all
+
+trData = load('hw4_nnet_train.dat');
+x_tr = trData(:,1:2);
+y_tr = trData(:,end);
 
 teData = load('hw4_nnet_test.dat');
 x_te = teData(:,1:2);
 y_te = teData(:,end);
 
-M = 6;
-
 Nout = 1;
 
-Ndim = size(x_te,2);
+Ndim = size(x_tr,2);
+
+Ntr = size(x_tr,1);
 
 Nte = size(x_te,1);
 
-Net = [Ndim M Nout];
+Eout_col = {};
+M=[1 6 11 16 21];
+for cc=1:size(M,2),
+    tic
+    Net = [Ndim M(cc) Nout];
 
-Nhl = size(Net,2)-2;
+    r = 0.1; eta = 0.1;
 
-r = 0.1; eta = 0.1;
-
-T = 50000;
-
-H = [];
-NNetTeCol = {};
-for n=1:Nte,
-    x = x_te(n,:);
-    NNetTe = {};
-    for i=1:Nhl+1,
-        w = NNet{i}.w;
-        if (i-1)==0,
-            in = [1 x]';
-        else
-            in = [1;NNetTe{i-1}.x];
-        end
-        s = w*in;
-        x_next = tanh(s);
-        NNetTe{i}.s = s;
-        NNetTe{i}.x = x_next;
+    T = 50000;
+    iter = 10;
+    E_col = zeros(iter,1);
+    fprintf('Calculating M = %d\n', M(cc));
+    parfor i=1:iter,
+        NNet = NNetTrain(x_tr, y_tr, Net, r, eta, T);
+        [H E] = NNetTest(x_te, y_te, Net, NNet);
+        E_col(i) = E;
     end
-    NNetTeCol{n} = NNetTe;
-    H = [H;NNetTe{Nhl+1}.x sign(NNetTe{Nhl+1}.x)];
+    %fprintf('\n');
+    Eout_col{cc}.M = M(cc);
+    Eout_col{cc}.Eout = mean(E_col);
+    toc
 end
-
-y_pre = H(:,2);
-
-Eout = sum(y_te~=y_pre)/Nte;
